@@ -1,4 +1,6 @@
 import { useState, useEffect } from "react";
+import Landing from "./pages/Landing";
+import Auth from "./pages/Auth";
 import Sidebar from "./components/Sidebar";
 import DashboardHome from "./components/DashboardHome";
 import RenderView from "./components/RenderView";
@@ -9,8 +11,14 @@ import SettingsView from "./components/SettingsView";
 import { ViewType } from "./types";
 import { motion, AnimatePresence } from "motion/react";
 import { Maximize2, X } from "lucide-react";
+import { cn } from "./lib/utils";
 
 export default function App() {
+  const [isAuthenticated, setIsAuthenticated] = useState(() => {
+    return localStorage.getItem("forma_auth") === "true";
+  });
+  const [showLanding, setShowLanding] = useState(!isAuthenticated);
+
   const [view, setView] = useState<ViewType>(() => {
     const saved = localStorage.getItem("forma_view");
     return (saved as ViewType) || "dashboard";
@@ -20,6 +28,26 @@ export default function App() {
   useEffect(() => {
     localStorage.setItem("forma_view", view);
   }, [view]);
+
+  const handleAuth = (user: any) => {
+    localStorage.setItem("forma_auth", "true");
+    setIsAuthenticated(true);
+    setShowLanding(false);
+  };
+
+  const logout = () => {
+    localStorage.removeItem("forma_auth");
+    setIsAuthenticated(false);
+    setShowLanding(true);
+  };
+
+  if (showLanding && !isAuthenticated) {
+    return <Landing onStart={() => setShowLanding(false)} />;
+  }
+
+  if (!isAuthenticated) {
+    return <Auth onAuth={handleAuth} />;
+  }
 
   const renderContent = () => {
     switch (view) {
@@ -45,8 +73,8 @@ export default function App() {
         <button 
           onClick={() => setIsPresentationMode(!isPresentationMode)}
           className={cn(
-            "fixed bottom-6 right-6 z-50 p-3 rounded-full bg-primary text-primary-foreground shadow-2xl transition-all hover:scale-110 active:scale-95 gold-glow",
-            isPresentationMode ? "bg-red-500" : "bg-primary"
+            "fixed bottom-6 right-6 z-50 p-3 rounded-full shadow-2xl transition-all hover:scale-110 active:scale-95 gold-glow",
+            isPresentationMode ? "bg-red-500 text-white" : "bg-primary text-primary-foreground"
           )}
         >
           {isPresentationMode ? <X size={24} /> : <Maximize2 size={24} />}
@@ -69,11 +97,6 @@ export default function App() {
       </main>
     </div>
   );
-}
-
-// Helper needed here local too if I use it
-function cn(...inputs: any[]) {
-  return inputs.filter(Boolean).join(" ");
 }
 
 
