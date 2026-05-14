@@ -1,0 +1,8 @@
+{
+  "name": "FORMA",
+  "description": "Plateforme SaaS pour architectes combinant Render AI et Agent IA spécialisé en architecture française.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
